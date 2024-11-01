@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pikachu Recorder</title>
+    <style>
+        /* Reset and Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            background: linear-gradient(135deg, #f6d365, #fda085, #fbc2eb, #a18cd1);
+            background-size: 300% 300%;
+            animation: gradient 12s ease infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Animated Gradient */
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            margin-bottom: 30px;
+            color: #555;
+            font-size: 18px;
+        }
+
+        /* Record Button */
+        .button-wrapper {
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .button {
+            width: 200px;
+            height: 50px;
+            line-height: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        .button:active {
+            transform: scale(0.95);
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: none;
+            margin-top: 15px;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Audio Controls */
+        audio {
+            margin-top: 20px;
+            width: 100%;
+        }
+    </style>
+    <script>
+        async function startRecording() {
+            try {
+                const button = document.querySelector('.button');
+                const spinner = document.querySelector('.loading-spinner');
+                const audioContainer = document.querySelector('#audioContainer');
+                
+                // Disable button and show loading spinner
+                button.disabled = true;
+                spinner.style.display = 'block';
+
+                // Fetch audio from the backend
+                const response = await fetch('/start_recording?duration=5');
+                if (!response.ok) throw new Error('Recording failed');
+
+                const blob = await response.blob();
+                const audioUrl = URL.createObjectURL(blob);
+
+                // Create and display the audio player
+                const audio = new Audio(audioUrl);
+                audio.controls = true;
+                audioContainer.innerHTML = ''; // Clear previous audio player if any
+                audioContainer.appendChild(audio);
+
+                audio.play();
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to record audio. Please try again.');
+            } finally {
+                // Re-enable button and hide spinner
+                document.querySelector('.button').disabled = false;
+                document.querySelector('.loading-spinner').style.display = 'none';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 Pikachu Recorder 🎤</h1>
+        <p>Press the button below to start recording your audio!</p>
+
+        <div class="button-wrapper">
+            <button class="button" onclick="startRecording()">Record</button>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div class="loading-spinner"></div>
+
+        <!-- Audio Player Container -->
+        <div id="audioContainer"></div>
+    </div>
+</body>
+</html>
