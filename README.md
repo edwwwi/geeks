@@ -102,7 +102,7 @@ def record_audio(filename, duration=5):
     # Save the audio to a file
     sf.write(filename, audio_data, 44100)  # Save as WAV file with sample rate
 
-# Function to modify the pitch
+# Function to modify the pitch of the audio
 def modify_pitch(filename, pitch_factor=1.5):
     data, samplerate = sf.read(filename)
     new_data = np.interp(np.arange(0, len(data), pitch_factor), np.arange(0, len(data)), data)
